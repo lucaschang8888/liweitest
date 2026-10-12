@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>門市服務丙級檢定 ‧ 快樂學習關卡 (31-60題)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+            letter-spacing: 0.05em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* 護眼主題定義 */
+        .theme-warm {
+            background-color: #FAF6ED;
+            color: #332C27;
+        }
+        .theme-warm .card-bg { background-color: #FFFFFF; border-color: #E6DCB8; }
+        .theme-warm .primary-btn { background-color: #E58A2B; color: #FFFFFF; }
+        .theme-warm .primary-btn:hover { background-color: #D1781A; }
+        .theme-warm .accent-bg { background-color: #FFF9E6; }
+
+        .theme-mint {
+            background-color: #F0F7F4;
+            color: #1B3B32;
+        }
+        .theme-mint .card-bg { background-color: #FFFFFF; border-color: #B2D8CE; }
+        .theme-mint .primary-btn { background-color: #2D9373; color: #FFFFFF; }
+        .theme-mint .primary-btn:hover { background-color: #23785D; }
+        .theme-mint .accent-bg { background-color: #E2F2ED; }
+
+        .theme-dark {
+            background-color: #1A202C;
+            color: #EDF2F7;
+        }
+        .theme-dark .card-bg { background-color: #2D3748; border-color: #4A5568; }
+        .theme-dark .primary-btn { background-color: #4FD1C5; color: #1A202C; }
+        .theme-dark .primary-btn:hover { background-color: #38B2AC; }
+        .theme-dark .accent-bg { background-color: #283141; }
+
+        /* 字體大小設置 */
+        .font-normal-size { font-size: 1.125rem; line-height: 1.8; }
+        .font-large-size { font-size: 1.35rem; line-height: 2.0; }
+        .font-xlarge-size { font-size: 1.6rem; line-height: 2.2; }
+
+        /* 動畫效果 */
+        @keyframes bounce-short {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .bounce-active { animation: bounce-short 0.4s ease-in-out; }
+        
+        /* 避免選取與放大按鈕點擊感 */
+        .btn-touch {
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        /* 紙花 Canvas 全螢幕覆蓋 */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="theme-warm font-normal-size min-h-screen flex flex-col justify-between pb-10 selection:bg-amber-200">
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- 頂部資訊列與遊戲化狀態 -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-4 pb-2">
+        <div class="card-bg border-2 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <!-- 標題與圖像 -->
+            <div class="flex items-center space-x-3">
+                <span class="text-3xl sm:text-4xl">🌟</span>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-wide">門市服務丙級 ‧ 學習樂園</h1>
+                    <p class="text-xs sm:text-sm opacity-75">專為你打造的第 31 - 60 題複習神器</p>
+                </div>
+            </div>
+
+            <!-- XP 與 連勝紀錄 -->
+            <div class="flex items-center space-x-4 font-bold text-sm sm:text-base">
+                <div class="flex items-center space-x-1 bg-amber-100 text-amber-900 px-3 py-1.5 rounded-full border border-amber-300">
+                    <span>⭐ XP:</span>
+                    <span id="user-xp" class="text-lg">0</span>
+                </div>
+                <div class="flex items-center space-x-1 bg-orange-100 text-orange-900 px-3 py-1.5 rounded-full border border-orange-300">
+                    <span>🔥 連勝:</span>
+                    <span id="user-streak" class="text-lg">0</span>
+                </div>
+                <!-- 設定按鈕 -->
+                <button onclick="toggleSettingsModal()" class="p-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300 btn-touch transition" title="輔助設定">
+                    ⚙️ <span class="hidden sm:inline text-xs font-semibold">輔助設定</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 模式切換頁籤 -->
+        <nav class="flex justify-center my-4 space-x-2 sm:space-x-4">
+            <button id="tab-study" onclick="switchMode('study')" class="flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm primary-btn">
+                📖 觀念複習
+            </button>
+            <button id="tab-quiz" onclick="switchMode('quiz')" class="flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm bg-white border-gray-300 hover:bg-gray-50">
+                🎯 互動測驗
+            </button>
+            <button id="tab-mistakes" onclick="switchMode('mistakes')" class="flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm bg-white border-gray-300 hover:bg-gray-50 relative">
+                📕 錯題加強
+                <span id="mistake-badge" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- 主要答題/學習區域 -->
+    <main class="w-full max-w-3xl mx-auto px-4 flex-grow flex flex-col justify-center">
+        <!-- 題庫單一聚焦卡片 -->
+        <div id="question-card" class="card-bg border-3 border-amber-200 rounded-3xl p-5 sm:p-8 shadow-md relative transition-all duration-200">
+            
+            <!-- 卡片頂部資訊列：題號與語音朗讀按鈕 -->
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                <div class="flex items-center space-x-2">
+                    <span id="question-tag" class="px-3 py-1 rounded-full text-sm font-extrabold bg-amber-500 text-white">
+                        第 31 題
+                    </span>
+                    <span id="mode-indicator-text" class="text-xs sm:text-sm font-bold opacity-70">
+                        【複習模式】
+                    </span>
+                </div>
+
+                <!-- 語音朗讀按鈕 -->
+                <button id="tts-btn" onclick="speakCurrentQuestion()" class="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-1.5 rounded-2xl font-bold text-sm btn-touch shadow transition">
+                    <span class="text-lg">🔊</span>
+                    <span>讀給我聽</span>
+                </button>
+            </div>
+
+            <!-- 題目敘述區塊 -->
+            <div class="mb-6">
+                <p id="question-text" class="font-bold tracking-wide">
+                    載入題目中...
+                </p>
+            </div>
+
+            <!-- 選項按鈕區 -->
+            <div id="options-container" class="space-y-3 sm:space-y-4 mb-6">
+                <!-- 選項由 JS 動態渲染 -->
+            </div>
+
+            <!-- 白話觀念解析區塊 (複習模式或回答後顯示) -->
+            <div id="explanation-box" class="hidden accent-bg p-4 sm:p-5 rounded-2xl border-2 border-amber-300 mt-4 transition-all">
+                <div class="flex items-center space-x-2 mb-1 text-amber-800 font-bold">
+                    <span class="text-2xl">💡</span>
+                    <span class="text-lg">白話文輕鬆記：</span>
+                </div>
+                <p id="explanation-text" class="text-sm sm:text-base opacity-90 leading-relaxed">
+                    解析加載中...
+                </p>
+            </div>
+
+            <!-- 測驗結算畫面 (預設隱藏) -->
+            <div id="quiz-result-box" class="hidden text-center py-8 space-y-6">
+                <div class="text-6xl animate-bounce">🏆</div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold">太棒了！完成本次測驗！</h2>
+                <div class="accent-bg p-6 rounded-2xl border-2 max-w-sm mx-auto space-y-2">
+                    <p class="text-lg font-bold">獲得總分：<span id="final-score" class="text-3xl font-black text-amber-600">0</span> 分</p>
+                    <p id="final-eval-text" class="text-sm font-semibold opacity-80">表現得非常出色！</p>
+                </div>
+                <div class="flex justify-center space-x-4">
+                    <button onclick="restartQuiz()" class="primary-btn font-bold px-6 py-3 rounded-2xl shadow-lg btn-touch">
+                        🔄 重新挑戰一次
+                    </button>
+                    <button onclick="switchMode('mistakes')" class="bg-red-500 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-2xl shadow-lg btn-touch">
+                        📕 查看錯題彙整
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 底部切換與進度控制 -->
+        <div id="navigation-controls" class="flex items-center justify-between mt-6 px-2">
+            <button onclick="prevQuestion()" id="prev-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold px-4 sm:px-6 py-2.5 rounded-2xl btn-touch transition shadow disabled:opacity-40">
+                ⬅️ 上一題
+            </button>
+
+            <!-- 進度數字 -->
+            <div class="text-center font-bold text-sm sm:text-base">
+                <span id="current-index-num">1</span> / <span id="total-count-num">30</span>
+            </div>
+
+            <button onclick="nextQuestion()" id="next-btn" class="primary-btn font-bold px-4 sm:px-6 py-2.5 rounded-2xl btn-touch transition shadow">
+                下一題 ➡️
+            </button>
+        </div>
+    </main>
+
+    <!-- 輔助設定彈出視窗 (Modal) -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="card-bg border-2 border-gray-300 w-full max-w-md rounded-3xl p-6 shadow-2xl space-y-6">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-xl font-extrabold flex items-center gap-2">
+                    <span>⚙️</span> 閱讀與輔助設定
+                </h3>
+                <button onclick="toggleSettingsModal()" class="text-2xl font-bold p-1 hover:opacity-70">✕</button>
+            </div>
+
+            <!-- 1. 字體大小 -->
+            <div class="space-y-2">
+                <label class="font-bold text-sm block">1. 字體大小 (放大更清晰)：</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setFontSize('normal')" class="py-2 border-2 rounded-xl font-bold btn-touch hover:bg-gray-100 text-sm">標準</button>
+                    <button onclick="setFontSize('large')" class="py-2 border-2 rounded-xl font-bold btn-touch hover:bg-gray-100 text-base">放大</button>
+                    <button onclick="setFontSize('xlarge')" class="py-2 border-2 rounded-xl font-bold btn-touch hover:bg-gray-100 text-lg">特大</button>
+                </div>
+            </div>
+
+            <!-- 2. 色彩主題 -->
+            <div class="space-y-2">
+                <label class="font-bold text-sm block">2. 護眼主題配色：</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setTheme('warm')" class="py-2 border-2 border-amber-300 bg-amber-50 text-amber-900 rounded-xl font-bold btn-touch text-sm">暖日米黃</button>
+                    <button onclick="setTheme('mint')" class="py-2 border-2 border-teal-300 bg-teal-50 text-teal-900 rounded-xl font-bold btn-touch text-sm">靜謐薄荷</button>
+                    <button onclick="setTheme('dark')" class="py-2 border-2 border-slate-600 bg-slate-800 text-slate-100 rounded-xl font-bold btn-touch text-sm">舒眠暗色</button>
+                </div>
+            </div>
+
+            <!-- 3. 語音朗讀速度 -->
+            <div class="space-y-2">
+                <label class="font-bold text-sm block">3. 語音朗讀速度：</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="setTTSRate(0.8)" class="py-2 border-2 rounded-xl font-bold btn-touch hover:bg-gray-100 text-sm">慢速 (0.8x)</button>
+                    <button onclick="setTTSRate(1.0)" class="py-2 border-2 rounded-xl font-bold btn-touch hover:bg-gray-100 text-sm">適中 (1.0x)</button>
+                    <button onclick="setTTSRate(1.2)" class="py-2 border-2 rounded-xl font-bold btn-touch hover:bg-gray-100 text-sm">稍快 (1.2x)</button>
+                </div>
+            </div>
+
+            <button onclick="toggleSettingsModal()" class="w-full primary-btn font-bold py-3 rounded-2xl shadow btn-touch text-center">
+                完成設定，繼續學習 ✨
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /* 門市服務丙級 31-60 題完整題庫與白話解析數據 */
+        const QUESTION_BANK = [
+            {
+                id: 31,
+                q: "關於下列敘述何者有誤？",
+                options: [
+                    "網路及電話行銷均為直效行銷",
+                    "電視購物不屬直效行銷",
+                    "直效行銷多採一對一銷售方式",
+                    "直效行銷源自於郵購與型錄行銷"
+                ],
+                ans: 2,
+                explain: "電視購物（TV Shopping）也是直接面對顧客發送訊息的，所以它『屬於』直效行銷的一種喔！選項 (2) 說它不屬於是錯誤的。"
+            },
+            {
+                id: 32,
+                q: "信用卡集點換購全聯福利中心商品，以提升雙方業績的作法，這是哪一種結盟的方式？",
+                options: [
+                    "同業結盟",
+                    "分散經營風險",
+                    "委託結盟",
+                    "異業聯盟"
+                ],
+                ans: 4,
+                explain: "銀行（發行信用卡）和超市（全聯）是完全不同種類的行業合作，所以叫做『異業聯盟』。"
+            },
+            {
+                id: 33,
+                q: "零售業依經營型態來分，下列何者為非？",
+                options: [
+                    "超級市場",
+                    "獨立商店",
+                    "便利商店",
+                    "百貨公司"
+                ],
+                ans: 2,
+                explain: "『獨立商店』是依據『所有權』來分的（自己開的店），超市、便利商店、百貨公司才是依據『經營型態（業態）』劃分。"
+            },
+            {
+                id: 34,
+                q: "下列何者非設立獨立商店的特性？",
+                options: [
+                    "採購成本高",
+                    "能夠達到經濟規模",
+                    "可以提供個人化的商品或服務",
+                    "自主性較高"
+                ],
+                ans: 2,
+                explain: "獨立商店通常規模小、進貨量小，因此很難達到大規模購買降低成本的『經濟規模』。"
+            },
+            {
+                id: 35,
+                q: "下列何者非屬於量販店的型態經營？",
+                options: [
+                    "屈臣氏(Watsons)",
+                    "好市多(Costco)",
+                    "家樂福(Carrefour)",
+                    "愛買(AMart)"
+                ],
+                ans: 1,
+                explain: "屈臣氏是藥妝專賣店；好市多、家樂福、愛買才是大型量販店。"
+            },
+            {
+                id: 36,
+                q: "以下哪一零售業態已逐漸式微即將被市場淘汰？",
+                options: [
+                    "雜貨店",
+                    "購物中心",
+                    "百貨公司",
+                    "量販店"
+                ],
+                ans: 1,
+                explain: "傳統古早味的柑仔店（雜貨店），因為設備較陳舊且連鎖超商普及，正逐漸式微。"
+            },
+            {
+                id: 37,
+                q: "零售業態經營之區分方式下列何者為非？",
+                options: [
+                    "依消費者有無面對面接觸作區分",
+                    "依營業額做區分",
+                    "依經營策略作區分",
+                    "依所有權劃分"
+                ],
+                ans: 2,
+                explain: "劃分零售業態不會單純看『營業額大小』，而是看經營型態、服務方式和所有權等。"
+            },
+            {
+                id: 38,
+                q: "下列何者為便利商店之特徵？",
+                options: [
+                    "商品高單價",
+                    "商品多樣多量",
+                    "時間地點的便利",
+                    "個性化的購物空間"
+                ],
+                ans: 3,
+                explain: "便利商店最大的優勢就是 24 小時營業、距離近，提供『時間與地點的便利』。"
+            },
+            {
+                id: 39,
+                q: "下列何者不是異業合作的案例？",
+                options: [
+                    "統一企業將捷盟行銷與7-ELEVEN、家樂福物流作整合",
+                    "聯邦信用卡在中油加油每公升省2元",
+                    "天仁茗茶在中秋節推出茶月餅，月餅搭配茶葉禮盒",
+                    "全家便利商店與使用悠遊卡紅利點數兌換商品"
+                ],
+                ans: 1,
+                explain: "選項 (1) 是統一企業集團內部的物流資源整合，屬於企業內的物流整合，不是異業合作。"
+            },
+            {
+                id: 40,
+                q: "零售商可提供信用、包裝、送貨、維修、保證、退貨是屬於零售的哪一項功能？",
+                options: [
+                    "增加商品與服務的價值",
+                    "提供訊息給製造商、批發商、其他單位或個人",
+                    "提供具特色的商品",
+                    "提供顧客服務"
+                ],
+                ans: 4,
+                explain: "刷卡、幫忙包裝、送貨到家、壞了免費維修退貨，這些都屬於貼心的『顧客服務』。"
+            },
+            {
+                id: 41,
+                q: "下列何者屬於行銷通路中最終的角色？",
+                options: [
+                    "批發商",
+                    "製造商",
+                    "零售商",
+                    "消費者"
+                ],
+                ans: 4,
+                explain: "產品做出來最後就是給『消費者』買回去使用，所以消費者是通路的最後一步。"
+            },
+            {
+                id: 42,
+                q: "關於零售管理功能的「提供多樣化的商品」，以下哪個選項不符合？",
+                options: [
+                    "阿瘦皮鞋販售比一般店面更多具備機能性的皮鞋",
+                    "全聯超市販售多種類的日常生活用品",
+                    "7-11便利商店推出購物集點滿額贈送公仔",
+                    "好市多量販店販售較大量且多元化的商品"
+                ],
+                ans: 3,
+                explain: "集點送公仔是『促銷活動』，並不是在講店裡擺放多樣化的賣品商品組合。"
+            },
+            {
+                id: 43,
+                q: "關於零售管理的功能，以下描述何者為非？",
+                options: [
+                    "增加商品與服務的價值",
+                    "提供顧客服務",
+                    "提供單一的商品",
+                    "儲存"
+                ],
+                ans: 3,
+                explain: "零售店要給客人很多選擇（多樣化商品），只給『單一商品』就太不方便囉！"
+            },
+            {
+                id: 44,
+                q: "要將節能減碳觀念融入門市體系中，其重要步驟之敘述下列何者為非？",
+                options: [
+                    "規劃發展和執行節能減碳行銷改革的過程",
+                    "只需建立穩固的高層共同認知",
+                    "確定可運用資源",
+                    "確定高階管理要兌現他們對節能減碳的承諾，並以身作則"
+                ],
+                ans: 2,
+                explain: "環保節能不能『只需』高層知道，基層店員和全體員工都要一起參與落實才有用。"
+            },
+            {
+                id: 45,
+                q: "以下有關綠色行銷之敘述何者為非？",
+                options: [
+                    "綠色行銷和傳統的社會行銷關注範圍皆是全球性",
+                    "綠色行銷重視的基本價值超過社會使用價值",
+                    "綠色行銷較有長期性的開放式遠景",
+                    "綠色行銷著重於自然環境"
+                ],
+                ans: 1,
+                explain: "傳統的社會行銷常常只關心在地局部問題，而綠色行銷關心全球的地球永續與自然環境。"
+            },
+            {
+                id: 46,
+                q: "下列何者非從事顧客關係管理的競爭優勢？",
+                options: [
+                    "透過販售顧客相關資料增加收入",
+                    "提昇忠誠度",
+                    "增加營業額",
+                    "精簡成本"
+                ],
+                ans: 1,
+                explain: "私自賣掉顧客個資是違法又不誠實的行為，絕對不能當作 CRM 的好處！"
+            },
+            {
+                id: 47,
+                q: "下列何者非網路行銷的優勢？",
+                options: [
+                    "不具有互動性",
+                    "可全年24小時不間斷的行銷傳播",
+                    "資料內容可隨時更新",
+                    "無國界之分"
+                ],
+                ans: 1,
+                explain: "網路行銷最棒的地方就是可以跟網友『隨時留言互動』，選項 (1) 說沒有互動性是錯的。"
+            },
+            {
+                id: 48,
+                q: "企業在設計、生產、包裝時，降低商品不利於環境保護的因素，並強調以建立環保為訴求的服務導向，進而引導消費者加入綠色消費的行銷方式稱為",
+                options: [
+                    "關係行銷",
+                    "網路行銷",
+                    "服務行銷",
+                    "綠色行銷"
+                ],
+                ans: 4,
+                explain: "強調環保、減少污染、愛地球的行銷策略，就叫做『綠色行銷』。"
+            },
+            {
+                id: 49,
+                q: "下列何者兼顧店舖與無店舖之銷售方式？",
+                options: [
+                    "蝦皮拍賣網站賣服飾",
+                    "街上推銷商品的直銷人員",
+                    "飛機上推著免費餐車的空中小姐",
+                    "7-Eleven門市內的預購目錄"
+                ],
+                ans: 4,
+                explain: "7-11 是實體店面（店舖），但翻目錄預購訂商品則是型錄購物（無店舖），結合了兩種優勢。"
+            },
+            {
+                id: 50,
+                q: "零售業態劃分之基礎為何？",
+                options: [
+                    "品牌",
+                    "商品種類",
+                    "經營型態",
+                    "商品線深度及廣度"
+                ],
+                ans: 3,
+                explain: "零售『業態』就是依據『經營型態』（例如超市、超商、量販店的營運方式）來分類的。"
+            },
+            {
+                id: 51,
+                q: "客製化行銷之觀念下列敘述何者為宜？",
+                options: [
+                    "1對1顧客行銷",
+                    "銷售",
+                    "社會行銷",
+                    "行銷"
+                ],
+                ans: 1,
+                explain: "『客製化』就是針對個人專屬量身訂做，所以是一對一（1對1）的顧客行銷。"
+            },
+            {
+                id: 52,
+                q: "零售業發展最重要趨勢是",
+                options: [
+                    "商品化",
+                    "連鎖化",
+                    "資訊化",
+                    "地區化"
+                ],
+                ans: 2,
+                explain: "現代零售業開越來越多分店，發揮規模經濟，最關鍵的發展趨勢就是『連鎖化』。"
+            },
+            {
+                id: 53,
+                q: "全台灣最早出現的業態是",
+                options: [
+                    "量販店",
+                    "百貨公司",
+                    "超級市場",
+                    "便利商店"
+                ],
+                ans: 2,
+                explain: "台灣最早出現的現代化零售店家是日治時期就有的『百貨公司』（例如菊元百貨、林百貨）。"
+            },
+            {
+                id: 54,
+                q: "在同一商圈之內，店與店之間有互斥力也有互相吸引的能力稱為",
+                options: [
+                    "損失迴避原則",
+                    "競合效果",
+                    "競爭效用",
+                    "月暈效果"
+                ],
+                ans: 2,
+                explain: "同在一區既有競爭搶客人，又能一起把市場做大吸人氣，這種既競爭又合作叫『競合效果』。"
+            },
+            {
+                id: 55,
+                q: "下列何種商店最不適合開在上班路線上？",
+                options: [
+                    "便利商店",
+                    "早餐店",
+                    "咖啡店",
+                    "精品店"
+                ],
+                ans: 4,
+                explain: "上班族趕時間買早餐、咖啡、便利物品；而精品店需要慢慢逛慢慢選，不適合急忙的上班動線。"
+            },
+            {
+                id: 56,
+                q: "賣場服務人員總是儀容整齊，穿著制服，請問這屬於賣場活性化中哪一項？",
+                options: [
+                    "聽覺活性化",
+                    "嗅覺活性化",
+                    "味覺活性化",
+                    "視覺活性化"
+                ],
+                ans: 4,
+                explain: "服裝儀容整齊是用眼睛看的，給客人良好的第一印象，屬於『視覺活性化』。"
+            },
+            {
+                id: 57,
+                q: "零售業發展的最大限制在於",
+                options: [
+                    "土地",
+                    "資金",
+                    "技術",
+                    "商圈"
+                ],
+                ans: 4,
+                explain: "開店能做多少生意，最受限於周邊『商圈』的人口多少與消費能力。"
+            },
+            {
+                id: 58,
+                q: "目前台灣占國內生產毛額(GDP)比重最高的產業為何？",
+                options: [
+                    "製造業",
+                    "紡織業",
+                    "服務業",
+                    "農業機械業"
+                ],
+                ans: 3,
+                explain: "台灣現在經濟發展是以『服務業』為大宗，佔了 GDP 比重超過六成以上！"
+            },
+            {
+                id: 59,
+                q: "連鎖加盟店建立一致性品質及共通性的技術之三S原則，下列何者不包括？",
+                options: [
+                    "專業化",
+                    "簡單化",
+                    "同步化",
+                    "標準化"
+                ],
+                ans: 3,
+                explain: "連鎖 3S 原則是：簡單化 (Simplification)、標準化 (Standardization)、專業化 (Specialization)，不包括『同步化』。"
+            },
+            {
+                id: 60,
+                q: "下列何種商店不屬於自助式銷售型態？",
+                options: [
+                    "百貨公司",
+                    "超級市場",
+                    "量販店",
+                    "便利商店"
+                ],
+                ans: 1,
+                explain: "超市、量販店、超商都是你自己拿購物車挑選（自助）；百貨公司主要是專櫃人員服務您。"
+            }
+        ];
+
+        // 全局狀態變數
+        let currentMode = 'study'; // 'study', 'quiz', 'mistakes'
+        let currentQuestionsList = [...QUESTION_BANK];
+        let currentIndex = 0;
+        let selectedAnswers = {}; // { questionId: selectedOptionIndex }
+        let mistakeIds = JSON.parse(localStorage.getItem('store_quiz_mistakes') || '[]');
+        let userXP = parseInt(localStorage.getItem('store_quiz_xp') || '0');
+        let userStreak = parseInt(localStorage.getItem('store_quiz_streak') || '0');
+        let ttsSpeed = 1.0;
+
+        // 初始化頁面
+        window.onload = function() {
+            updateUserStatsDisplay();
+            updateMistakeBadge();
+            renderQuestionCard();
+            
+            // 監聽鍵盤左右鍵，方便操作
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') prevQuestion();
+                if (e.key === 'ArrowRight') nextQuestion();
+            });
+        };
+
+        // 切換模式
+        function switchMode(mode) {
+            currentMode = mode;
+            currentIndex = 0;
+
+            // UI 頁籤狀態更新
+            document.getElementById('tab-study').className = mode === 'study' 
+                ? 'flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm primary-btn' 
+                : 'flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm bg-white text-gray-800 border-gray-300 hover:bg-gray-50';
+            
+            document.getElementById('tab-quiz').className = mode === 'quiz' 
+                ? 'flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm primary-btn' 
+                : 'flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm bg-white text-gray-800 border-gray-300 hover:bg-gray-50';
+
+            document.getElementById('tab-mistakes').className = mode === 'mistakes' 
+                ? 'flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm primary-btn relative' 
+                : 'flex-1 max-w-[160px] py-2.5 px-3 rounded-2xl font-bold text-center border-2 btn-touch transition shadow-sm bg-white text-gray-800 border-gray-300 hover:bg-gray-50 relative';
+
+            if (mode === 'study') {
+                currentQuestionsList = [...QUESTION_BANK];
+                document.getElementById('mode-indicator-text').innerText = '【複習模式 - 顯示解答與白話文】';
+            } else if (mode === 'quiz') {
+                currentQuestionsList = [...QUESTION_BANK].sort(() => Math.random() - 0.5); // 隨機洗牌
+                selectedAnswers = {};
+                document.getElementById('mode-indicator-text').innerText = '【測驗模式 - 即時給分計勝】';
+            } else if (mode === 'mistakes') {
+                const mistakes = QUESTION_BANK.filter(q => mistakeIds.includes(q.id));
+                if (mistakes.length === 0) {
+                    alert('目前沒有錯題記錄喔！繼續保持，太棒了！👏');
+                    switchMode('study');
+                    return;
+                }
+                currentQuestionsList = mistakes;
+                document.getElementById('mode-indicator-text').innerText = '【錯題加強本 - 專注攻克弱點】';
+            }
+
+            // 隱藏測驗結果
+            document.getElementById('quiz-result-box').classList.add('hidden');
+            document.getElementById('navigation-controls').classList.remove('hidden');
+
+            renderQuestionCard();
+        }
+
+        // 渲染目前題目卡片
+        function renderQuestionCard() {
+            window.speechSynthesis.cancel(); // 切換時取消朗讀
+
+            if (currentQuestionsList.length === 0) return;
+
+            const qData = currentQuestionsList[currentIndex];
+            
+            // 更新進度與標籤
+            document.getElementById('question-tag').innerText = `第 ${qData.id} 題`;
+            document.getElementById('question-text').innerText = qData.q;
+            document.getElementById('current-index-num').innerText = currentIndex + 1;
+            document.getElementById('total-count-num').innerText = currentQuestionsList.length;
+
+            // 控制上一題/下一題按鈕狀態
+            document.getElementById('prev-btn').disabled = currentIndex === 0;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            const userSelected = selectedAnswers[qData.id];
+
+            qData.options.forEach((optText, idx) => {
+                const optNum = idx + 1;
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-4 rounded-2xl border-2 font-bold transition flex items-start space-x-3 btn-touch shadow-sm `;
+
+                // 選項顏色邏輯 (複習模式 vs 測驗模式)
+                if (currentMode === 'study') {
+                    if (optNum === qData.ans) {
+                        btn.className += 'bg-emerald-100 border-emerald-500 text-emerald-900';
+                    } else {
+                        btn.className += 'bg-white/80 border-gray-200 hover:border-amber-300 opacity-90';
+                    }
+                } else {
+                    // 測驗模式與錯題模式
+                    if (userSelected !== undefined) {
+                        if (optNum === qData.ans) {
+                            btn.className += 'bg-emerald-100 border-emerald-500 text-emerald-900 font-black';
+                        } else if (optNum === userSelected) {
+                            btn.className += 'bg-rose-100 border-rose-400 text-rose-900';
+                        } else {
+                            btn.className += 'bg-gray-50 border-gray-200 opacity-60';
+                        }
+                    } else {
+                        btn.className += 'bg-white border-gray-200 hover:border-amber-400 hover:bg-amber-50';
+                    }
+                }
+
+                btn.onclick = () => handleSelectOption(qData, optNum);
+
+                btn.innerHTML = `
+                    <span class="w-8 h-8 flex items-center justify-center rounded-xl bg-amber-200 text-amber-900 font-black text-sm shrink-0 mt-0.5">
+                        ${optNum}
+                    </span>
+                    <span class="flex-grow pt-0.5">${optText}</span>
+                    ${currentMode === 'study' && optNum === qData.ans ? '<span class="text-emerald-600 font-black text-lg">✓ 正確答案</span>' : ''}
+                    ${userSelected !== undefined && optNum === qData.ans ? '<span class="text-emerald-600 font-black">✓</span>' : ''}
+                    ${userSelected === optNum && optNum !== qData.ans ? '<span class="text-rose-600 font-black">✕</span>' : ''}
+                `;
+
+                optionsContainer.appendChild(btn);
+            });
+
+            // 白話解析區塊
+            const explanationBox = document.getElementById('explanation-box');
+            const explanationText = document.getElementById('explanation-text');
+
+            if (currentMode === 'study' || userSelected !== undefined) {
+                explanationText.innerText = qData.explain;
+                explanationBox.classList.remove('hidden');
+            } else {
+                explanationBox.classList.add('hidden');
+            }
+        }
+
+        // 點擊選擇選項邏輯
+        function handleSelectOption(qData, selectedNum) {
+            if (currentMode === 'study') {
+                // 複習模式下點擊朗讀該選項
+                speakText(`選項 ${selectedNum}：${qData.options[selectedNum - 1]}`);
+                return;
+            }
+
+            if (selectedAnswers[qData.id] !== undefined) return; // 已回答過
+
+            selectedAnswers[qData.id] = selectedNum;
+
+            if (selectedNum === qData.ans) {
+                // 答對獎勵
+                playAudioFx('correct');
+                triggerConfetti();
+                userXP += 10;
+                userStreak += 1;
+                saveUserStats();
+
+                // 如果原本在錯題本中且答對，將錯題移除
+                if (mistakeIds.includes(qData.id)) {
+                    mistakeIds = mistakeIds.filter(id => id !== qData.id);
+                    localStorage.setItem('store_quiz_mistakes', JSON.stringify(mistakeIds));
+                    updateMistakeBadge();
+                }
+            } else {
+                // 答錯邏輯
+                playAudioFx('wrong');
+                userStreak = 0; // 連勝中斷但不懲罰扣扣幣
+                saveUserStats();
+
+                // 加入錯題收集箱
+                if (!mistakeIds.includes(qData.id)) {
+                    mistakeIds.push(qData.id);
+                    localStorage.setItem('store_quiz_mistakes', JSON.stringify(mistakeIds));
+                    updateMistakeBadge();
+                }
+            }
+
+            updateUserStatsDisplay();
+            renderQuestionCard();
+        }
+
+        // 上一題 / 下一題 控制
+        function nextQuestion() {
+            if (currentIndex < currentQuestionsList.length - 1) {
+                currentIndex++;
+                renderQuestionCard();
+            } else if (currentMode === 'quiz') {
+                showQuizResult();
+            } else {
+                alert('已經是最後一題囉！表現得太棒了！🎉');
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                renderQuestionCard();
+            }
+        }
+
+        // 顯示測驗結算畫面
+        function showQuizResult() {
+            let correctCount = 0;
+            currentQuestionsList.forEach(q => {
+                if (selectedAnswers[q.id] === q.ans) correctCount++;
+            });
+
+            const score = Math.round((correctCount / currentQuestionsList.length) * 100);
+
+            document.getElementById('options-container').innerHTML = '';
+            document.getElementById('explanation-box').classList.add('hidden');
+            document.getElementById('navigation-controls').classList.add('hidden');
+
+            const resultBox = document.getElementById('quiz-result-box');
+            resultBox.classList.remove('hidden');
+
+            document.getElementById('final-score').innerText = score;
+
+            let evalText = "太厲害了！你對門市服務觀念非常紮實！";
+            if (score < 80) evalText = "很棒的嘗試！點擊『錯題彙整』再複習一下會更厲害喔！";
+            document.getElementById('final-eval-text').innerText = evalText;
+
+            playAudioFx('fanfare');
+            triggerConfetti();
+        }
+
+        function restartQuiz() {
+            switchMode('quiz');
+        }
+
+        // 語音朗讀功能 (Text-to-Speech)
+        function speakCurrentQuestion() {
+            if (currentQuestionsList.length === 0) return;
+            const qData = currentQuestionsList[currentIndex];
+            
+            let speakContent = `第 ${qData.id} 題。${qData.q}。`;
+            qData.options.forEach((opt, i) => {
+                speakContent += `選項 ${i + 1}：${opt}。`;
+            });
+
+            if (currentMode === 'study' || selectedAnswers[qData.id] !== undefined) {
+                speakContent += `正確答案是選項 ${qData.ans}。觀念解析：${qData.explain}`;
+            }
+
+            speakText(speakContent);
+        }
+
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) {
+                alert('您的瀏覽器不支援語音朗讀功能。');
+                return;
+            }
+            window.speechSynthesis.cancel(); // 停止先前的朗讀
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-TW';
+            utterance.rate = ttsSpeed;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // 音效合成器 (Web Audio API)
+        function playAudioFx(type) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                if (type === 'correct') {
+                    // 愉悅的和弦音 C5 -> E5 -> G5 -> C6
+                    const freqs = [523.25, 659.25, 783.99, 1046.50];
+                    freqs.forEach((f, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.value = f;
+                        gain.gain.setValueAtTime(0.12, ctx.currentTime + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.25);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.08);
+                        osc.stop(ctx.currentTime + i * 0.08 + 0.25);
+                    });
+                } else if (type === 'wrong') {
+                    // 溫柔低音提示 (不給予極端懲罰音)
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(220, ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(140, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.2);
+                } else if (type === 'fanfare') {
+                    // 通關勝利音效
+                    const freqs = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+                    freqs.forEach((f, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'triangle';
+                        osc.frequency.value = f;
+                        gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.07);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.07 + 0.4);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.07);
+                        osc.stop(ctx.currentTime + i * 0.07 + 0.4);
+                    });
+                }
+            } catch (e) {
+                console.log('Audio Context not allowed without interaction');
+            }
+        }
+
+        // 彩色紙花動畫系統
+        function triggerConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6'];
+
+            for (let i = 0; i < 60; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 12,
+                    vy: (Math.random() - 0.7) * 12,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    alpha: 1
+                });
+            }
+
+            let animationFrame;
+            function renderConfetti() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3; // 重力
+                    p.alpha -= 0.02;
+
+                    if (p.alpha > 0) {
+                        alive = true;
+                        ctx.globalAlpha = p.alpha;
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                });
+
+                if (alive) {
+                    animationFrame = requestAnimationFrame(renderConfetti);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    cancelAnimationFrame(animationFrame);
+                }
+            }
+
+            renderConfetti();
+        }
+
+        // 輔助設定與輔助介面控制
+        function toggleSettingsModal() {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function setFontSize(size) {
+            document.body.classList.remove('font-normal-size', 'font-large-size', 'font-xlarge-size');
+            if (size === 'normal') document.body.classList.add('font-normal-size');
+            if (size === 'large') document.body.classList.add('font-large-size');
+            if (size === 'xlarge') document.body.classList.add('font-xlarge-size');
+        }
+
+        function setTheme(theme) {
+            document.body.classList.remove('theme-warm', 'theme-mint', 'theme-dark');
+            document.body.classList.add(`theme-${theme}`);
+        }
+
+        function setTTSRate(rate) {
+            ttsSpeed = rate;
+        }
+
+        function updateUserStatsDisplay() {
+            document.getElementById('user-xp').innerText = userXP;
+            document.getElementById('user-streak').innerText = userStreak;
+        }
+
+        function saveUserStats() {
+            localStorage.setItem('store_quiz_xp', userXP.toString());
+            localStorage.setItem('store_quiz_streak', userStreak.toString());
+        }
+
+        function updateMistakeBadge() {
+            const badge = document.getElementById('mistake-badge');
+            if (mistakeIds.length > 0) {
+                badge.innerText = mistakeIds.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
